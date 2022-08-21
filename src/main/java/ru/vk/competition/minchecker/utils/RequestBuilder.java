@@ -5,8 +5,8 @@ import okhttp3.RequestBody;
 
 public class RequestBuilder {
 
-    private static final String  API_ROOT =  new SystemVariables().apiRoot();
-
+    public static final String  API_ROOT =  new SystemVariables().apiRoot();
+    
     public static Request postRequestBuilder(String url, RequestBody requestBody) {
         return new Request.Builder()
                 .url(API_ROOT + url)
