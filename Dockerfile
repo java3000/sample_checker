@@ -13,6 +13,6 @@ COPY --from=build /home/app/target/minchecker-0.0.1-SNAPSHOT.jar /app/checker.ja
 COPY src /app/src
 
 EXPOSE 9081
-ENV rs.endpoint=http://192.168.1.4:9080
+#ENV rs.endpoint=http://192.168.1.4:9080
 
 ENTRYPOINT ["java", "-jar", "/app/checker.jar"]

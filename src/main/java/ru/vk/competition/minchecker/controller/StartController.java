@@ -17,7 +17,6 @@ public class StartController {
 
     @GetMapping("/start")
     public void onStartMission() {
-        log.info("start *** service");
         startService.onStartMission();
     }
 }
