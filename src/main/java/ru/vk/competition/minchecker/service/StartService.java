@@ -34,9 +34,9 @@ public class StartService {
         return singleQueryResult;
     }
 
-    private void sendPostQueryRequest(SingleQueryResult singleQueryResult, String s, String s2) throws IOException {
-        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
-                //.addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
+    private void sendPostQueryRequest(SingleQueryResult singleQueryResult, String s, String s2, String uriType, String uriMethod) throws IOException {
+        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + uriType + uriMethod).newBuilder()
+                .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
                 .build();
 
         String bodyJson = JsonBuilder.modifySingleQueryResultJsonBuilder(s, s2);
@@ -48,9 +48,9 @@ public class StartService {
         System.out.println(response1.code());
     }
 
-    private void sendPutQueryRequest(SingleQueryResult singleQueryResult, String s, String s2) throws IOException {
-        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
-                //.addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
+    private void sendPutQueryRequest(SingleQueryResult singleQueryResult, String s, String s2, String uriType, String uriMethod) throws IOException {
+        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + uriType + uriMethod).newBuilder()
+                .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
                 .build();
 
         String bodyJson = JsonBuilder.modifySingleQueryResultJsonBuilder(s, s2);
@@ -62,9 +62,9 @@ public class StartService {
         System.out.println(response1.code());
     }
 
-    private void sendDeleteQueryRequest(SingleQueryResult singleQueryResult, String s, String s2) throws IOException {
-        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
-                //.addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
+    private void sendDeleteQueryRequest(SingleQueryResult singleQueryResult, String s, String s2, String uriType, String uriMethod) throws IOException {
+        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + uriType + uriMethod).newBuilder()
+                .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
                 .build();
 
         String bodyJson = JsonBuilder.modifySingleQueryResultJsonBuilder(s, s2);
@@ -78,17 +78,49 @@ public class StartService {
 
     public void onStartMission() {
         try {
-            SingleQueryResult singleQueryResult = getQueryResult(1, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostQueryRequest(singleQueryResult, "", "");
+            // --ADD---
+            SingleQueryResult singleQueryResult1 = getQueryResult(1, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostQueryRequest(singleQueryResult1, "", "", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
             SingleQueryResult singleQueryResult2 = getQueryResult(2, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostQueryRequest(singleQueryResult2, "15", "select \\u002A from Customer");
+            sendPostQueryRequest(singleQueryResult2, "15", "select \\u002A from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
             SingleQueryResult singleQueryResult3 = getQueryResult(3, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostQueryRequest(singleQueryResult3, "3q", "select * from Customer");
+            sendPostQueryRequest(singleQueryResult3, "3q", "select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
             SingleQueryResult singleQueryResult4 = getQueryResult(4, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostQueryRequest(singleQueryResult4, "3", "select * from Customer");
+            sendPostQueryRequest(singleQueryResult4, "3", "select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+
+            SingleQueryResult singleQueryResult5 = getQueryResult(5, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostQueryRequest(singleQueryResult5, "3", "select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+
+            // ---DELETE---
+            // ---EXECUTE---
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onStartMission2() {
+        try {
+            // ---MODIFY---
+            SingleQueryResult singleQueryResult6 = getQueryResult(6, 200, Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY_RESULT);
+            sendPutQueryRequest(singleQueryResult6, "3", "select * from Artist", Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY);
+
+            SingleQueryResult singleQueryResult7 = getQueryResult(7, 406, Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY_RESULT);
+            sendPutQueryRequest(singleQueryResult7, "333", "select * from Artists", Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY);
+
+            SingleQueryResult singleQueryResult8 = getQueryResult(8, 406, Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY_RESULT);
+            sendPutQueryRequest(singleQueryResult8, "", "", Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY);
+
+            SingleQueryResult singleQueryResult9 = getQueryResult(9, 406, Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY_RESULT);
+            sendPutQueryRequest(singleQueryResult9, "qwe", "select COUNT(*) from Customer", Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY);
+
+            SingleQueryResult singleQueryResult10 = getQueryResult(10, 406, Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY_RESULT);
+            sendPutQueryRequest(singleQueryResult10, "1", "qwe", Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY);
+
+            // ---DELETE---
+            // ---EXECUTE---
         } catch (Exception e) {
             e.printStackTrace();
         }
