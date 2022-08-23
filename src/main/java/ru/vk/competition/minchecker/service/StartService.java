@@ -3,13 +3,14 @@ package ru.vk.competition.minchecker.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ru.vk.competition.minchecker.dto.results.SingleQueryResult;
 import ru.vk.competition.minchecker.utils.JsonBuilder;
 import ru.vk.competition.minchecker.utils.RequestBuilder;
 import ru.vk.competition.minchecker.utils.Urls;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -20,181 +21,74 @@ public class StartService {
 
     private final String RESULT_ID = "resultId";
 
+    @NotNull
+    private SingleQueryResult getQueryResult(int i, int i2, String uriType, String uriMethod) throws IOException {
+        SingleQueryResult singleQueryResult = new SingleQueryResult(i, i2);
+        String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
+        RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
+        Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(uriType + uriMethod, addSingleQueryResultRequestBody);
+        System.out.println(addNewSingleQueryResult.url());
+        Call call = client.newCall(addNewSingleQueryResult);
+        Response response = call.execute();
+        System.out.println(response.code());
+        return singleQueryResult;
+    }
+
+    private void sendPostQueryRequest(SingleQueryResult singleQueryResult, String s, String s2) throws IOException {
+        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
+                //.addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
+                .build();
+
+        String bodyJson = JsonBuilder.modifySingleQueryResultJsonBuilder(s, s2);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyJson);
+        Request request =  RequestBuilder.postRequestBuilder(url.toString(), body);
+
+        Call call1 = client.newCall(request);
+        Response response1 = call1.execute();
+        System.out.println(response1.code());
+    }
+
+    private void sendPutQueryRequest(SingleQueryResult singleQueryResult, String s, String s2) throws IOException {
+        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
+                //.addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
+                .build();
+
+        String bodyJson = JsonBuilder.modifySingleQueryResultJsonBuilder(s, s2);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyJson);
+        Request request =  RequestBuilder.putRequestBuilder(url.toString(), body);
+
+        Call call1 = client.newCall(request);
+        Response response1 = call1.execute();
+        System.out.println(response1.code());
+    }
+
+    private void sendDeleteQueryRequest(SingleQueryResult singleQueryResult, String s, String s2) throws IOException {
+        HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
+                //.addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
+                .build();
+
+        String bodyJson = JsonBuilder.modifySingleQueryResultJsonBuilder(s, s2);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyJson);
+        Request request =  RequestBuilder.deleteRequestBuilder(url.toString(), body);
+
+        Call call1 = client.newCall(request);
+        Response response1 = call1.execute();
+        System.out.println(response1.code());
+    }
+
     public void onStartMission() {
         try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(1, 400);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.ADD_NEW_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
+            SingleQueryResult singleQueryResult = getQueryResult(1, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostQueryRequest(singleQueryResult, "", "");
 
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+            SingleQueryResult singleQueryResult2 = getQueryResult(2, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostQueryRequest(singleQueryResult2, "15", "select \\u002A from Customer");
 
-    public void onStartMission2() {
-        try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(2, 201);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.ADD_NEW_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
+            SingleQueryResult singleQueryResult3 = getQueryResult(3, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostQueryRequest(singleQueryResult3, "3q", "select * from Customer");
 
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .addQueryParameter("queryId", "1")
-                    .addQueryParameter("query", "select * from Customer")
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onStartMission3() {
-        try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(3, 400);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.ADD_NEW_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
-
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.ADD_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .addQueryParameter("queryId", "\u7755")
-                    .addQueryParameter("query", "select * from Customer")
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onStartMission4() {
-        try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(4, 406);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
-
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .addQueryParameter("queryId", String.valueOf(Integer.MAX_VALUE))
-                    .addQueryParameter("query", "select * from Customer where order by Status")
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onStartMission6() {
-        try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(6, 406);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
-
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .addQueryParameter("queryId", "")
-                    .addQueryParameter("query", "")
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onStartMission7() {
-        try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(7, 406);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
-
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .addQueryParameter("queryId", "null")
-                    .addQueryParameter("query", "")
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onStartMission8() {
-        try {
-            SingleQueryResult singleQueryResult = new SingleQueryResult(8, 406);
-            String singleQueryResultJson = JsonBuilder.addSingleQueryResultJsonBuilder(singleQueryResult.resultId, singleQueryResult.code);
-            RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
-            Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY_RESULT, addSingleQueryResultRequestBody);
-            System.out.println(addNewSingleQueryResult.url());
-            Call call = client.newCall(addNewSingleQueryResult);
-            Response response = call.execute();
-            System.out.println(response.code());
-
-            HttpUrl url = HttpUrl.parse(RequestBuilder.API_ROOT + Urls.SINGLE_QUERY + Urls.MODIFY_SINGLE_QUERY).newBuilder()
-                    .addQueryParameter(RESULT_ID, singleQueryResult.resultId.toString())
-                    .addQueryParameter("queryId", "2")
-                    .addQueryParameter("query", "null")
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            Call call1 = client.newCall(request);
-            call1.execute();
+            SingleQueryResult singleQueryResult4 = getQueryResult(4, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostQueryRequest(singleQueryResult4, "3", "select * from Customer");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -9,7 +9,7 @@ public class JsonBuilder {
         return String.format(ADD_SINGLE_QUERY_RESULT_JSON, resultId, code);
     }
 
-    public static String modifySingleQueryResultJsonBuilder(Integer queryid, String query) {
+    public static String modifySingleQueryResultJsonBuilder(String queryid, String query) {
         return String.format(MODIFY_SINGLE_QUERY_RESULT_JSON, queryid, query);
     }
 }
