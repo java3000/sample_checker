@@ -19,5 +19,9 @@ public class StartController {
     public void onStartMission() {
         startService.onStartMission();
         startService.onStartMission2();
+        startService.onStartMission3();
+        //startService.onStartMission4();
+        startService.onStartMission5();
+        startService.onStartMission6();
     }
 }

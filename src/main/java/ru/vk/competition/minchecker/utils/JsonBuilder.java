@@ -12,4 +12,8 @@ public class JsonBuilder {
     public static String modifySingleQueryResultJsonBuilder(String queryid, String query) {
         return String.format(MODIFY_SINGLE_QUERY_RESULT_JSON, queryid, query);
     }
+
+    public static String deleteSingleQueryResultJsonBuilder(String queryid, String query) {
+        return String.format(MODIFY_SINGLE_QUERY_RESULT_JSON, queryid, query);
+    }
 }

@@ -1,8 +1,11 @@
 FROM maven:3.6.0-jdk-11-slim AS build
-COPY src /home/app/src
-COPY pom.xml /home/app
+COPY pom.xml /home/app/pom.xml
 
-RUN mvn -f /home/app/pom.xml clean package 
+RUN mvn -B -f /home/app/pom.xml dependency:go-offline
+
+COPY src /home/app/src
+
+RUN mvn -B -f /home/app/pom.xml package
 
 FROM openjdk:11
 
@@ -14,5 +17,7 @@ COPY src /app/src
 
 EXPOSE 9081
 #ENV rs.endpoint=http://192.168.1.4:9080
+
+ENTRYPOINT ["java", "-jar", "/app/checker.jar"]
 
 ENTRYPOINT ["java", "-jar", "/app/checker.jar"]
