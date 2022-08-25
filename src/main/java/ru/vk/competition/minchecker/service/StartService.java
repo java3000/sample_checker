@@ -17,18 +17,56 @@ public class StartService {
     OkHttpClient client = new OkHttpClient();
     public static final String API_ROOT = new SystemVariables().apiRoot();
 
-    private Result getResult(Query query, RequestType requestType, Integer resultId, Integer code, String uriType, String uriMethod) {
+    private Result getResult(Query query, RequestType requestType, OperationType operationType, Integer resultId, Integer code, String uriType, String uriMethod) {
         Result result = null;
         String json = "";
 
         switch (requestType) {
             case SINGLE_QUERY:
-                result = new SingleQueryResult(resultId, code);
-                json = JsonBuilder.addSingleQueryResultJsonBuilder(resultId, code);
+                switch (operationType) {
+                    case ADD:
+                        result = new SingleQueryResult(resultId, code);
+                        json = JsonBuilder.addSingleQueryResultJson(resultId, code);
+                        break;
+                    case GET:
+                        result = new SingleQueryResult(resultId, code);
+                        json = JsonBuilder.getSingleQueryResultJson(resultId, code, ((SingleQuery)query).getId(), ((SingleQuery) query).getQuery());
+                        break;
+                    case DELETE:
+                        result = new SingleQueryResult(resultId, code);
+                        json = JsonBuilder.deleteSingleQueryResultJson(resultId, code);
+                        break;
+                    case MODIFY:
+                        result = new SingleQueryResult(resultId, code);
+                        json = JsonBuilder.modifySingleQueryResultJson(resultId, code);
+                        break;
+                    case EXECUTE:
+                    case GETALL:
+                        result = new SingleQueryResult(resultId, code);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + operationType);
+                }
                 break;
             case TABLE_QUERY:
-                result = new TableQueryResult(resultId, code, (TableQuery) query);
-                json = JsonBuilder.addTableQueryResultJsonBuilder(resultId, code, (TableQuery) query);
+                switch (operationType) {
+                    case ADD:
+                        result = new TableQueryResult(resultId, code, (TableQuery) query);
+                        json = JsonBuilder.addTableQueryResultJson(resultId, code, (TableQuery) query);
+                        break;
+                    case GET:
+                        break;
+                    case DELETE:
+                        break;
+                    case MODIFY:
+                        break;
+                    case EXECUTE:
+                        break;
+                    case GETALL:
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + operationType);
+                }
                 break;
             case TABLE:
                 break;
@@ -51,7 +89,7 @@ public class StartService {
         return result;
     }
 
-    private void sendPostRequest (Result result, RequestType requestType, OperationType operationType, String uriType, String uriMethod) {
+    private void sendPostRequest (Result result, Query query, RequestType requestType, OperationType operationType, String uriType, String uriMethod) {
         HttpUrl url = null;
 
         String bodyJson = "";
@@ -64,15 +102,14 @@ public class StartService {
 
                 switch (operationType) {
                     case ADD:
-                        break;
-                    case GET:
-                        break;
-                    case DELETE:
+                        bodyJson = JsonBuilder.addSingleQueryResultJson(((SingleQueryResult) result).getResultId(), ((SingleQueryResult) result).getCode());
                         break;
                     case MODIFY:
+                        bodyJson = JsonBuilder.modifySingleQueryJson(((SingleQuery)query).getId(), ((SingleQuery) query).getQuery());
                         break;
+                    case GET:
+                    case DELETE:
                     case EXECUTE:
-                        break;
                     case GETALL:
                         break;
                     default:
@@ -126,29 +163,40 @@ public class StartService {
 
     public void onStartMission() {
         try {
+
+            Query[] queries = new Query[] {
+                    new SingleQuery(Integer.MAX_VALUE, "select"),
+                    new SingleQuery(Integer.MAX_VALUE, "select * from Customer"),
+                    new SingleQuery(15, "select \\u002A from Customer"),
+                    new SingleQuery(Integer.MIN_VALUE, "select * from Customer"),
+                    new SingleQuery(3221, ";--select * from Customer"),
+                    new SingleQuery(3321, ";select * from Customer"),
+                    new SingleQuery(3421, "if exists(select * from Customer)"),
+            };
+
             //region --- ADD ---
-            Query singleQueryResult1 = getResult(10, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult1, Integer.MAX_VALUE, "select", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult1 = getResult(queries[0], RequestType.SINGLE_QUERY, OperationType.ADD, 10, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult1, queries[0], RequestType.SINGLE_QUERY, OperationType.ADD, Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
-            Query singleQueryResult2 = getResult(11, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult2, Integer.MAX_VALUE, "select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult2 = getResult(queries[1], RequestType.SINGLE_QUERY, OperationType.ADD,11, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult2, queries[1], RequestType.SINGLE_QUERY, OperationType.ADD,Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
-            Query singleQueryResult3 = getResult(12, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult3, 15, "select \\u002A from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult3 = getResult(queries[2], RequestType.SINGLE_QUERY, OperationType.ADD,12, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult3,  queries[2], RequestType.SINGLE_QUERY, OperationType.ADD, Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
-            Query singleQueryResult7 = getResult(16, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult7, Integer.MIN_VALUE, "select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult7 = getResult(queries[3], RequestType.SINGLE_QUERY, OperationType.ADD,16, 400, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult7, queries[3], RequestType.SINGLE_QUERY, OperationType.ADD,Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
-            Query singleQueryResult8 = getResult(17, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult8, 3221, ";--select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult8 = getResult(queries[4], RequestType.SINGLE_QUERY, OperationType.ADD,17, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult8, queries[4], RequestType.SINGLE_QUERY, OperationType.ADD, Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
-            Query singleQueryResult9 = getResult(18, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult9, 3321, ";select * from Customer", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult9 = getResult(queries[5], RequestType.SINGLE_QUERY, OperationType.ADD,18, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult9, queries[5], RequestType.SINGLE_QUERY, OperationType.ADD, Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
 
-            Query singleQueryResult10 = getResult(19, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
-            sendPostRequest(singleQueryResult10, 3421, "if exists(select * from Customer)", Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
+            Result singleQueryResult10 = getResult(queries[6], RequestType.SINGLE_QUERY, OperationType.ADD,19, 201, Urls.SINGLE_QUERY, Urls.ADD_NEW_QUERY_RESULT);
+            sendPostRequest(singleQueryResult10, queries[6], RequestType.SINGLE_QUERY, OperationType.ADD,Urls.SINGLE_QUERY, Urls.ADD_SINGLE_QUERY);
             //endregion
-
+/*
             //region --- MODIFY ---
             Query singleQueryResult21 = getResult(20, 406, Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY_RESULT);
                 sendPutSingleQueryRequest(singleQueryResult21, Integer.MAX_VALUE, "select", Urls.SINGLE_QUERY, Urls.MODIFY_SINGLE_QUERY);
@@ -263,89 +311,10 @@ public class StartService {
 
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    public void onStartMission2() {
-        try {
-
-            //region ADD
-            Query tableQueryResult1 = getResult(110, "Customer", "select", 406, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult1, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-
-            Query tableQueryResult2 = getResult(111, "Customer", "select * from Customer", 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult2, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-
-            Query tableQueryResult3 = getResult(112, "Customer", "select \\u002A from Customer", 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult3, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-
-            Query tableQueryResult4 = getResult(113, "Customer", "select * from Customer", 406, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult4, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-
-            Query tableQueryResult5 = getResult(114, "Customer", ";--select * from Customer", 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult5, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-
-            Query tableQueryResult6 = getResult(115, "Customer", ";select * from Customer", 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult6, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-
-            Query tableQueryResult7 = getResult(116, "Customer", "if exists(select * from Customer)", 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
-            sendPostRequest(tableQueryResult7, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
-            //endregion
-
-            //region MODIFY
-            Query tableQueryResult21 = getResult(220, 406, "Customer", "select", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult21, tableQueryResult21.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-
-            Query tableQueryResult22 = getResult(221, 200, "Customer", "select * from Customer", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult22, tableQueryResult22.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-
-            Query tableQueryResult23 = getResult(222, 200, "Customer", "select \\u002A from Customer", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult23, tableQueryResult23.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-
-            Query tableQueryResult27 = getResult(223, 406, "Customer", "select * from Customer", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult27, tableQueryResult27.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-
-            Query tableQueryResult28 = getResult(224, 200, "Customer", ";--select * from Customer", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult28, tableQueryResult28.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-
-            Query tableQueryResult29 = getResult(225, 200, "Customer", ";select * from Customer", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult29, tableQueryResult29.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-
-            Query tableQueryResult20 = getResult(226, 200, "Customer", "if exists(select * from Customer)", Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY_RESULT);
-            sendPutTableQueryRequest(tableQueryResult20, tableQueryResult20.tableQuery, Urls.TABLE_QUERY, Urls.MODIFY_TABLE_QUERY);
-            //endregion
-
-            //region DELETE
-            Query tableQueryResult1 = getResult(330, 406, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult1, Integer.MAX_VALUE, "select", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-
-            Query tableQueryResult2 = getResult(331, 202, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult2, Integer.MAX_VALUE, "select * from Customer", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-
-            Query tableQueryResult3 = getResult(332, 202, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult3, 15, "select \\u002A from Customer", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-
-            Query tableQueryResult7 = getResult(336, 406, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult7, Integer.MIN_VALUE, "select * from Customer", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-
-            Query tableQueryResult8 = getResult(337, 202, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult8, 3221, ";--select * from Customer", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-
-            Query tableQueryResult9 = getResult(338, 202, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult9, 3321, ";select * from Customer", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-
-            Query tableQueryResult10 = getResult(339, 202, Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_RESULT);
-            sendDeleteSingleQueryRequest(tableQueryResult10, 3421, "if exists(select * from Customer)", Urls.TABLE_QUERY, Urls.DELETE_TABLE_QUERY_BY_ID);
-            //endregion
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }
