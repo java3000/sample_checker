@@ -350,7 +350,7 @@ public class StartService {
             };
 
             //region --- ADD ---
-            Result singleQueryResult1 = getResult(queries[0], QueryType.TABLE_QUERY, OperationType.ADD, 10, 400, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
+            Result singleQueryResult1 = getResult(queries[0], QueryType.TABLE_QUERY, OperationType.ADD, 10, 406, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
             sendRequest(singleQueryResult1, queries[0], QueryType.TABLE_QUERY, OperationType.ADD, RequestType.POST, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
 
             Result singleQueryResult2 = getResult(queries[1], QueryType.TABLE_QUERY, OperationType.ADD, 11, 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
@@ -359,7 +359,7 @@ public class StartService {
             Result singleQueryResult3 = getResult(queries[2], QueryType.TABLE_QUERY, OperationType.ADD, 12, 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
             sendRequest(singleQueryResult3, queries[2], QueryType.TABLE_QUERY, OperationType.ADD, RequestType.POST, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
 
-            Result singleQueryResult7 = getResult(queries[3], QueryType.TABLE_QUERY, OperationType.ADD, 16, 400, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
+            Result singleQueryResult7 = getResult(queries[3], QueryType.TABLE_QUERY, OperationType.ADD, 16, 406, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
             sendRequest(singleQueryResult7, queries[3], QueryType.TABLE_QUERY, OperationType.ADD, RequestType.POST, Urls.TABLE_QUERY, Urls.ADD_TABLE_QUERY);
 
             Result singleQueryResult8 = getResult(queries[4], QueryType.TABLE_QUERY, OperationType.ADD, 17, 201, Urls.TABLE_QUERY, Urls.ADD_NEW_TABLE_QUERY_RESULT);
