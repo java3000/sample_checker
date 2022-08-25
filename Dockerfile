@@ -19,5 +19,3 @@ EXPOSE 9081
 #ENV rs.endpoint=http://192.168.1.4:9080
 
 ENTRYPOINT ["java", "-jar", "/app/checker.jar"]
-
-ENTRYPOINT ["java", "-jar", "/app/checker.jar"]
