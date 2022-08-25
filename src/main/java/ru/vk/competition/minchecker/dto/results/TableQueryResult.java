@@ -2,11 +2,11 @@ package ru.vk.competition.minchecker.dto.results;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TableQueryResult {
+public class TableQueryResult implements Result {
 
-    public final Integer resultId;
-    public final Integer code;
-    public final TableQuery tableQuery;
+    Integer resultId;
+    Integer code;
+    TableQuery tableQuery;
 
     public TableQueryResult(
             @JsonProperty("resultId") Integer resultId,
@@ -15,6 +15,30 @@ public class TableQueryResult {
     ) {
         this.resultId = resultId;
         this.code = code;
+        this.tableQuery = tableQuery;
+    }
+
+    public Integer getResultId() {
+        return resultId;
+    }
+
+    public void setResultId(Integer resultId) {
+        this.resultId = resultId;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public TableQuery getTableQuery() {
+        return tableQuery;
+    }
+
+    public void setTableQuery(TableQuery tableQuery) {
         this.tableQuery = tableQuery;
     }
 }

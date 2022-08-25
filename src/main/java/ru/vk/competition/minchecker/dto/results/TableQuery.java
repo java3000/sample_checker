@@ -2,7 +2,7 @@ package ru.vk.competition.minchecker.dto.results;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TableQuery {
+public class TableQuery implements Query {
     public final Integer queryId;
     public final String tableName;
     public final String query;
