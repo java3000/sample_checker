@@ -78,7 +78,7 @@ public class StartService {
 
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), json);
         Request addNewResult = RequestBuilder.postRequestBuilder(API_ROOT + uriType + uriMethod, body);
-        System.out.println(addNewResult.url());
+        System.out.println("result : " + addNewResult.url());
         Call call = client.newCall(addNewResult);
 
         try {
@@ -96,20 +96,31 @@ public class StartService {
 
         switch (queryType) {
             case SINGLE_QUERY:
-                url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
-                        .addQueryParameter("resultId", String.valueOf(((SingleQueryResult) result).getResultId()))
-                        .build();
-
                 switch (operationType) {
                     case ADD:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                //.addQueryParameter("resultId", String.valueOf(((SingleQueryResult) result).getResultId()))
+                                .build();
                         bodyJson = JsonBuilder.addSingleQueryResultJson(((SingleQueryResult) result).getResultId(), ((SingleQueryResult) result).getCode());
                         break;
                     case MODIFY:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                //.addQueryParameter("resultId", String.valueOf(((SingleQueryResult) result).getResultId()))
+                                .build();
                         bodyJson = JsonBuilder.modifySingleQueryJson(((SingleQuery) query).getId(), ((SingleQuery) query).getQuery());
                         break;
                     case GET:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod  + "/" + 3).newBuilder()
+                                //.addQueryParameter("resultId", String.valueOf(((SingleQueryResult) result).getResultId()))
+                                .build();
                     case DELETE:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod  + "/" + 3).newBuilder()
+                                //.addQueryParameter("resultId", String.valueOf(((SingleQueryResult) result).getResultId()))
+                                .build();
                     case EXECUTE:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod  + "/" + 3).newBuilder()
+                                //.addQueryParameter("resultId", String.valueOf(((SingleQueryResult) result).getResultId()))
+                                .build();
                     case GETALL:
                         break;
                     default:
@@ -118,22 +129,37 @@ public class StartService {
 
                 break;
             case TABLE_QUERY:
-                url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
-                        .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
-                        .build();
 
                 switch (operationType) {
                     case ADD:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
+                                .build();
                         break;
                     case GET:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
+                                .build();
                         break;
                     case DELETE:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
+                                .build();
                         break;
                     case MODIFY:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
+                                .build();
                         break;
                     case EXECUTE:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
+                                .build();
                         break;
                     case GETALL:
+                        url = HttpUrl.parse(API_ROOT + uriType + uriMethod).newBuilder()
+                                .addQueryParameter("resultId", String.valueOf(((TableQueryResult) result).getResultId()))
+                                .build();
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + operationType);
@@ -158,15 +184,15 @@ public class StartService {
                 request = RequestBuilder.putRequestBuilder(url.toString(), body);
                 break;
             case DELETE:
-                request = RequestBuilder.deleteRequestBuilder(url.toString() + "/" + ((SingleQuery)query).getId(), body);
+                request = RequestBuilder.deleteRequestBuilder(url.toString(), body);
                 break;
             case GET:
-                request = RequestBuilder.getRequestBuilder(url.toString() + "/" + ((SingleQuery)query).getId());
+                request = RequestBuilder.getRequestBuilder(url.toString());
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + requestType);
         }
-
+        System.out.println("request2: " + request.toString());
         Call call1 = client.newCall(request);
 
         Response response = null;
@@ -340,13 +366,13 @@ public class StartService {
         try {
 
             Query[] queries = new Query[]{
-                    new SingleQuery(Integer.MAX_VALUE, "select"),
-                    new SingleQuery(Integer.MAX_VALUE, "select * from Customer"),
-                    new SingleQuery(15, "select \\u002A from Customer"),
-                    new SingleQuery(Integer.MIN_VALUE, "select * from Customer"),
-                    new SingleQuery(3221, ";--select * from Customer"),
-                    new SingleQuery(3321, ";select * from Customer"),
-                    new SingleQuery(3421, "if exists(select * from Customer)"),
+                    new TableQuery(Integer.MAX_VALUE,"",  "select"),
+                    new TableQuery(Integer.MAX_VALUE, "Customer", "select * from "),
+                    new TableQuery(15,"Customer",  "select \\u002A from Customer"),
+                    new TableQuery(Integer.MIN_VALUE,"Customer",  "select * from Customer"),
+                    new TableQuery(3221, "Customer", ";--select * from Customer"),
+                    new TableQuery(3321, "Customer", ";select * from Customer"),
+                    new TableQuery(3421,"Customer",  "if exists(select * from Customer)"),
             };
 
             //region --- ADD ---
@@ -443,9 +469,10 @@ public class StartService {
 
             // --- GET ---
             try {
-                SingleQueryResult singleQueryResult = new SingleQueryResult(50, 500);
+                TableQuery query = new TableQuery(((TableQuery)queries[0]).getQueryId(), "Customer", "select * from Customer");
+                TableQueryResult tableQueryResult = new TableQueryResult(((TableQuery)queries[0]).getQueryId(),500,((TableQuery)queries[0]));
                 String singleQueryResultJson = String.format("{\"resultId:\"%1$d, \"code\":%1$d, \"queryId\":%1$d, \"query\":%s}",
-                        singleQueryResult.getResultId(), singleQueryResult.getCode(), 3, "select * from Customer");
+                        ((TableQuery)queries[0]).getQueryId(), 500, 3, "select * from Customer");
                 RequestBody addSingleQueryResultRequestBody = RequestBody.create(MediaType.parse("application/json"), singleQueryResultJson);
                 Request addNewSingleQueryResult = RequestBuilder.postRequestBuilder(API_ROOT + Urls.TABLE_QUERY + Urls.GET_TABLE_QUERY_BY_ID_RESULT, addSingleQueryResultRequestBody);
                 System.out.println(addNewSingleQueryResult.url());
@@ -453,7 +480,7 @@ public class StartService {
                 Response response = call.execute();
 
                 HttpUrl url = HttpUrl.parse(API_ROOT + Urls.TABLE_QUERY + Urls.GET_TABLE_QUERY_BY_ID + "/" + 3).newBuilder()
-                        .addQueryParameter("resultId", String.valueOf(singleQueryResult.getResultId()))
+                        .addQueryParameter("resultId", String.valueOf(((TableQuery)queries[0]).getQueryId()))
                         .build();
                 Request request = RequestBuilder.getRequestBuilder(url.toString());
 
